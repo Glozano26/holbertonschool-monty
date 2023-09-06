@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
 	if (argc != 2)
 	{
-		fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+		fprintf(stderr, "USAGE: monty file\n");
 		exit(EXIT_FAILURE);
 	}
 	file = fopen(argv[1], "r");
@@ -25,31 +25,41 @@ int main(int argc, char *argv[])
 	while (getline(&line, &len, file) != -1)
 	{
 		line_number++;
-		opcode = strtok(line, " \n");
+		opcode = strtok(line, " \t$\n");
 		if (opcode == NULL || opcode[0] == '#')
 		continue;
 
 		if (strcmp(opcode, "push") == 0)
 		{
-			value = strtok(NULL, " \n");
+			value = strtok(NULL, " -\n");
 			if (value == NULL || !isdigit(value[0]))
 			{
 				fprintf(stderr, "L%lu: usage: push integer\n", line_number);
 				fclose(file);
 				free(line);
 				exit(EXIT_FAILURE);
-			}
-			push(&stack, atoi(value));
-		}
-		else if (strcmp(opcode, "pall") == 0)
+                        }
+                        push(&stack, atoi(value));
+                }
+                else if (strcmp(opcode, "pall") == 0)
+                {
+                        pall(&stack, line_number);
+                }
+		else
 		{
-			pall(&stack, line_number);
+			fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
+			fclose(file);
+			free(line);
+			free_dlistint(stack);
+			exit(EXIT_FAILURE);
 		}
 	free(line); /*libera el bufer de la linea asignada*/
-	line = NULL;
-	}
+        line = NULL;
+        }
+        free_dlistint(stack);
+	free(line);
 	fclose(file);
-	return (0);
+        return (0);
 }
 /**
  * push - Pushes an element onto the stack
@@ -58,21 +68,21 @@ int main(int argc, char *argv[])
  */
 void push(stack_t **stack, int value)
 {
-	stack_t *new_node;
+        stack_t *new_node;
 
-	new_node = malloc(sizeof(stack_t));
-	if (new_node == NULL)
-	{
-		fprintf(stderr, "Error: malloc failed\n");
-		exit(EXIT_FAILURE);
-	}
-	new_node->n = value;
-	new_node->prev = NULL;
-	new_node->next = *stack;
+        new_node = malloc(sizeof(stack_t));
+        if (new_node == NULL)
+        {
+                fprintf(stderr, "Error: malloc failed\n");
+                exit(EXIT_FAILURE);
+        }
+        new_node->n = value;
+        new_node->prev = NULL;
+        new_node->next = *stack;
 
-	if (*stack != NULL)
-		(*stack)->prev = new_node;
-	*stack = new_node;
+        if (*stack != NULL)
+                (*stack)->prev = new_node;
+        *stack = new_node;
 }
 /**
  * pall - Prints all values on the stack
@@ -81,12 +91,29 @@ void push(stack_t **stack, int value)
  */
 void pall(stack_t **stack, unsigned int line_number)
 {
-	stack_t *current = *stack;
-	(void)line_number; /*Parametro no utilizado*/
+        stack_t *current = *stack;
+        (void)line_number; /*Parametro no utilizado*/
 
-	while (current != NULL)
+        while (current != NULL)
 	{
-		printf("%d\n", current->n);
-		current = current->next;
+                printf("%d\n", current->n);
+                current = current->next;
+        }
+}
+
+/**
+ * free_dlistint - function that frees a list
+ * @head: pointer to the header of the nodes
+ * Return: void
+ */
+void free_dlistint(stack_t *stack)
+{
+	stack_t *tmp;
+
+	while (stack != NULL)
+	{
+		tmp = stack;
+		stack = stack->next;
+		free(tmp);
 	}
 }
