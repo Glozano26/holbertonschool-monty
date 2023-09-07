@@ -55,6 +55,10 @@ int main(int argc, char *argv[])
 		{
 			pall(&stack, line_number);
 		}
+		else if (strcmp(opcode, "pint") == 0)
+		{
+			pint(&stack, line_number);
+		}
 		else
 		{
 			fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
@@ -131,4 +135,13 @@ void free_dlistint(stack_t *stack)
 		stack = stack->next;
 		free(tmp);
 	}
+}
+void pint(stack_t **stack, unsigned int line_number)
+{
+	if (*stack == NULL)
+	{
+		fprintf(stderr, "L%u: can't pint, stack empty\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	printf("%d\n", (*stack)->n);
 }
