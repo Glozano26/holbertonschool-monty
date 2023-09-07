@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
 		{
 			pint(&stack, line_number);
 		}
+		else if (strcmp(opcode, "swap") == 0)
+		{
+			swap(&stack, line_number);
+		}
 		else
 		{
 			fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
@@ -144,4 +148,37 @@ void pint(stack_t **stack, unsigned int line_number)
 		exit(EXIT_FAILURE);
 	}
 	printf("%d\n", (*stack)->n);
+}
+/*void pop(stack_t **stack, unsigned int line_number)
+{	
+	stack_t *aux;
+	
+	while (stack)
+	{
+		aux = *stack;
+		*stack = (*stack)->next;
+		stack = aux;
+		if (*stack == NULL)
+		{
+			fprintf(stderr, "L%u: can't pop an empty stack\n", line_number);
+			exit(EXIT_FAILURE);
+		}
+	}
+}*/
+void swap(stack_t **stack, unsigned int line_number)
+{
+	stack_t *node_to_swap = *stack;
+	(void)line_number;/*Parametro no Utilizado*/
+
+	if(*stack == NULL || (*stack)->next == NULL)
+	{
+		fprintf(stderr, "L%u: can't swap, stack too short\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	(*stack) = node_to_swap->next;
+	(*stack)->prev = NULL;
+	node_to_swap->prev = (*stack)->next->prev;
+	(*stack)->next->prev = node_to_swap;
+	node_to_swap->next = (*stack)->next;
+	(*stack)->next = node_to_swap;
 }
