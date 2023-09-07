@@ -80,6 +80,10 @@ int main(int argc, char *argv[])
 			}
 			swap(&stack, 0);
 		}
+		else if (strcmp(opcode, "nop") == 0)
+		{
+			nop(&stack, line_number);
+		}
 		else
 		{
 			fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
