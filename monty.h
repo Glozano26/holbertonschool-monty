@@ -43,5 +43,5 @@ void pint(stack_t **stack, unsigned int line_number);
 int pop(stack_t **stack, unsigned int line_number);
 void swap(stack_t **stack, unsigned int line_number);
 size_t dlistint_len(const stack_t *stack);
-
+void nop(stack_t **stack, unsigned int line_number;)
 #endif
