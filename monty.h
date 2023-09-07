@@ -35,13 +35,13 @@ typedef struct instruction_s
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
-stack_t *stack = NULL;
+extern stack_t *stack;
 void push(stack_t **stack, int value);
 void pall(stack_t **stack, unsigned int line_number);
 void free_dlistint(stack_t *stack);
-int integer_valid(const char *str);
 void pint(stack_t **stack, unsigned int line_number);
-void pop(stack_t **stack, unsigned int line_number);
+int pop(stack_t **stack, unsigned int line_number);
 void swap(stack_t **stack, unsigned int line_number);
-#endif
+size_t dlistint_len(const stack_t *stack);
 
+#endif

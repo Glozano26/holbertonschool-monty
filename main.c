@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
 	size_t line_number = 0, len = 0;
 	FILE *file;
 	int i;
+	stack_t *stack = NULL;
+	size_t nodes;
 
 	if (argc != 2)
 	{
@@ -59,9 +61,24 @@ int main(int argc, char *argv[])
 		{
 			pint(&stack, line_number);
 		}
+		else if (strcmp(opcode, "pop") == 0)
+		{
+			if (stack == NULL)
+			{
+				fprintf(stderr, "L%lu: can't pop an empty stack\n", line_number);
+				exit(EXIT_FAILURE);	
+			}
+			pop(&stack, 0);
+		}
 		else if (strcmp(opcode, "swap") == 0)
 		{
-			swap(&stack, line_number);
+			nodes = dlistint_len(stack);
+			if (nodes < 2)
+			{
+				fprintf(stderr, "L%lu: can't swap, stack too short\n", line_number);
+				exit(EXIT_FAILURE);
+			}
+			swap(&stack, 0);
 		}
 		else
 		{
@@ -140,45 +157,37 @@ void free_dlistint(stack_t *stack)
 		free(tmp);
 	}
 }
+
+/**
+ * pint - function that prints the value at the top of the stack, followed by a new line.
+ * @stack: pointer to the header of the nodesi
+ * @line_number: line number of file
+ * Return: void
+ */
 void pint(stack_t **stack, unsigned int line_number)
 {
-	if (*stack == NULL)
-	{
-		fprintf(stderr, "L%u: can't pint, stack empty\n", line_number);
-		exit(EXIT_FAILURE);
-	}
-	printf("%d\n", (*stack)->n);
+        if (*stack == NULL)
+        {
+                fprintf(stderr, "L%u: can't pint, stack empty\n", line_number);
+                exit(EXIT_FAILURE);
+        }
+        printf("%d\n", (*stack)->n);
 }
-/*void pop(stack_t **stack, unsigned int line_number)
-{	
-	stack_t *aux;
-	
-	while (stack)
-	{
-		aux = *stack;
-		*stack = (*stack)->next;
-		stack = aux;
-		if (*stack == NULL)
-		{
-			fprintf(stderr, "L%u: can't pop an empty stack\n", line_number);
-			exit(EXIT_FAILURE);
-		}
-	}
-}*/
-void swap(stack_t **stack, unsigned int line_number)
-{
-	stack_t *node_to_swap = *stack;
-	(void)line_number;/*Parametro no Utilizado*/
 
-	if(*stack == NULL || (*stack)->next == NULL)
+/**
+ * dlistint_len - function that returns the number of elements in a linked list
+ * @h: pointer to the header of the nodes
+ * Return: the numbers of nodes
+ */
+size_t dlistint_len(const stack_t *stack)
+{
+	size_t i = 0;
+	const stack_t *actual = stack;
+
+	while (actual != NULL)
 	{
-		fprintf(stderr, "L%u: can't swap, stack too short\n", line_number);
-		exit(EXIT_FAILURE);
+		actual = actual->next;
+		i++;
 	}
-	(*stack) = node_to_swap->next;
-	(*stack)->prev = NULL;
-	node_to_swap->prev = (*stack)->next->prev;
-	(*stack)->next->prev = node_to_swap;
-	node_to_swap->next = (*stack)->next;
-	(*stack)->next = node_to_swap;
+	return (i);
 }
