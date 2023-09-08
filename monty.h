@@ -46,5 +46,8 @@ size_t dlistint_len(const stack_t *stack);
 int sum_dlistint(stack_t *stack);
 int delete_dnodeint_at_index(stack_t **stack, unsigned int index);
 void nop(stack_t **stack, unsigned int line_number);
+void error_usage(void);
+void error_file_open(const char *filename);
+
 
 #endif

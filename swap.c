@@ -13,13 +13,6 @@ void swap(stack_t **stack, unsigned int line_number)
         stack_t *node_to_swap = *stack;
         (void)line_number;/*Parametro no Utilizado*/
 
-        /* *stack = node_to_swap->next;
-        (*stack)->prev = NULL;
-        node_to_swap->prev = (*stack)->next->prev;
-        (*stack)->next->prev = node_to_swap;
-        node_to_swap->next = (*stack)->next;
-        (*stack)->next = node_to_swap; */
-
 	node_to_swap = *stack;
 	temp2 = node_to_swap->n;
 	node_to_swap->n = node_to_swap->next->n;
