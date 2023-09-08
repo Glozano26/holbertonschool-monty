@@ -1,4 +1,5 @@
 #include "monty.h"
+
 /**
  * main - Monty interpreter main function
  * @argc: Argument count
@@ -8,20 +9,32 @@
 int main(int argc, char *argv[])
 {
 	char *opcode, *value, *line = NULL;
-	size_t line_number = 0, len = 0, nodes;
+	size_t line_number = 0, len = 0;
 	FILE *file;
-	int i, sum;
+	int i;
 	stack_t *stack = NULL;
 
 	if (argc != 2)
 	{
-		error_usage();
+		fprintf(stderr, "USAGE: monty file\n");
+		exit(EXIT_FAILURE);
 	}
 	file = fopen(argv[1], "r");
 	if (file == NULL)
 	{
-		error_file_open(argv[1]);
+		fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
+		exit(EXIT_FAILURE);
 	}
+
+	instruction_t opcodes[] = {
+		{"pall", pall},
+		{"pint", pint},
+		{"pop", pop},
+		{"swap", swap},
+		{"add", add},
+		{"nop", nop},
+		{NULL, NULL},
+	};
 	while (getline(&line, &len, file) != -1)
 	{
 		line_number++;
@@ -50,52 +63,23 @@ int main(int argc, char *argv[])
 			}
 		push(&stack, atoi(value));
 		}
-		else if (strcmp(opcode, "pall") == 0)
+
+		for (int i = 0; opcodes[i].opcode != NULL; i++)
 		{
-			pall(&stack, line_number);
-		}
-		else if (strcmp(opcode, "pint") == 0)
-		{
-			pint(&stack, line_number);
-		}
-		else if (strcmp(opcode, "pop") == 0)
-		{
-			if (stack == NULL)
+			if (strcmp(opcode, opcodes[i].opcode) == 0)
 			{
-				fprintf(stderr, "L%lu: can't pop an empty stack\n", line_number);
-				exit(EXIT_FAILURE);
+				opcodes[i].f(&stack, line_number);
+				break;
 			}
-			pop(&stack, 0);
 		}
-		else if (strcmp(opcode, "swap") == 0)
+		
+		if (opcodes[i].opcode == NULL)
 		{
-			nodes = dlistint_len(stack);
-			if (nodes < 2)
-			{
-				fprintf(stderr, "L%lu: can't swap, stack too short\n", line_number);
-				exit(EXIT_FAILURE);
-			}
-			swap(&stack, 0);
-		}
-		else if (strcmp(opcode, "add") == 0)
-		{
-			nodes = dlistint_len(stack);
-			if (nodes < 2)
-			{
-				fprintf(stderr, "L%lu: can't add, stack too short\n", line_number);
-				exit(EXIT_FAILURE);
-			}
-			sum = sum_dlistint(stack);
-			delete_dnodeint_at_index(&stack, 0);
-			stack->n = sum;
-		}
-		else if (strcmp(opcode, "nop") == 0)
-		{
-			nop(&stack, line_number);
-		}
-		else
-		{
-			void invalid_instruct(unsigned long line_number, const char *opcode, FILE *file, char *line, stack_t *stack);
+			fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
+			fclose(file);
+			free(line);
+			free_dlistint(stack);
+			exit(EXIT_FAILURE);
 		}
 	free(line);
 	line = NULL;
@@ -132,24 +116,6 @@ void push(stack_t **stack, int value)
 }
 
 /**
- * pall - Prints all values on the stack
- * @stack: Pointer to the stack
- * @line_number: Line number in the script
- */
-
-void pall(stack_t **stack, unsigned int line_number)
-{
-	stack_t *current = *stack;
-	(void)line_number; /*Parametro no utilizado*/
-
-	while (current != NULL)
-	{
-		printf("%d\n", current->n);
-		current = current->next;
-	}
-}
-
-/**
  * free_dlistint - function that frees a list
  * @head: pointer to the header of the nodes
  * Return: void
@@ -168,26 +134,11 @@ void free_dlistint(stack_t *stack)
 }
 
 /**
- * pint - function that prints the value at the top of the stack, followed by a new line.
- * @stack: pointer to the header of the nodesi
- * @line_number: line number of file
- * Return: void
- */
-void pint(stack_t **stack, unsigned int line_number)
-{
-        if (*stack == NULL)
-        {
-                fprintf(stderr, "L%u: can't pint, stack empty\n", line_number);
-                exit(EXIT_FAILURE);
-        }
-        printf("%d\n", (*stack)->n);
-}
-
-/**
  * dlistint_len - function that returns the number of elements in a linked list
  * @h: pointer to the header of the nodes
  * Return: the numbers of nodes
  */
+
 size_t dlistint_len(const stack_t *stack)
 {
 	size_t i = 0;
@@ -200,6 +151,7 @@ size_t dlistint_len(const stack_t *stack)
 	}
 	return (i);
 }
+
 /**
  * sum_dlistint - function that adds the top two elements of the stack
  * @stack : pointer to list
@@ -207,6 +159,7 @@ size_t dlistint_len(const stack_t *stack)
  */
 
 int sum_dlistint(stack_t *stack)
+
 {
 	int sum = 0, i = 0;
 
