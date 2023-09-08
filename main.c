@@ -8,11 +8,10 @@
 int main(int argc, char *argv[])
 {
 	char *opcode, *value, *line = NULL;
-	size_t line_number = 0, len = 0;
+	size_t line_number = 0, len = 0, nodes;
 	FILE *file;
 	int i, sum;
 	stack_t *stack = NULL;
-	size_t nodes;
 
 	if (argc != 2)
 	{
@@ -64,7 +63,7 @@ int main(int argc, char *argv[])
 			if (stack == NULL)
 			{
 				fprintf(stderr, "L%lu: can't pop an empty stack\n", line_number);
-				exit(EXIT_FAILURE);	
+				exit(EXIT_FAILURE);
 			}
 			pop(&stack, 0);
 		}
@@ -96,11 +95,7 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
-			fclose(file);
-			free(line);
-			free_dlistint(stack);
-			exit(EXIT_FAILURE);
+			void invalid_instruct(unsigned long line_number, const char *opcode, FILE *file, char *line, stack_t *stack);
 		}
 	free(line);
 	line = NULL;
