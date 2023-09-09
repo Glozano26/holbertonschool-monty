@@ -114,7 +114,7 @@ void push(stack_t **stack, int value)
 
 /**
  * free_dlistint - function that frees a list
- * @head: pointer to the header of the nodes
+ * @stack: pointer to free tmp
  * Return: void
  */
 
@@ -132,7 +132,7 @@ void free_dlistint(stack_t *stack)
 
 /**
  * dlistint_len - function that returns the number of elements in a linked list
- * @h: pointer to the header of the nodes
+ * @stack: pointer to the counter nodes
  * Return: the numbers of nodes
  */
 
@@ -173,11 +173,11 @@ int sum_dlistint(stack_t *stack)
 
 /**
  * delete_dnodeint_at_index - func that delet a new node at a given position
- * @head: pointer to the header of the nodes
+ * @stack: pointer to the header of the nodes
  * @index: the index of the list where the new node should be added
  * Return: 1 if it succeeded, -1 if it failed
  */
-
+/*
 int delete_dnodeint_at_index(stack_t **stack, unsigned int index)
 {
 	unsigned int i;
@@ -212,7 +212,7 @@ int delete_dnodeint_at_index(stack_t **stack, unsigned int index)
 	free(node_to_delete);
 	return (1);
 }
-
+*/
 /**
  *  invalid_instruct- Handles the case of an unknown instruction
  * @line_number: The line number in the script
