@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 	char *opcode, *value, *line = NULL;
 	size_t line_number = 0, len = 0;
 	FILE *file;
-	int i;
+	int i, j, flag;
 	stack_t *stack = NULL;
 
 	if (argc != 2)
@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 	};
 	while (getline(&line, &len, file) != -1)
 	{
+		flag = 0;
 		line_number++;
 		opcode = strtok(line, " \t$\n");
 		if (opcode == NULL || opcode[0] == '#')
@@ -62,25 +63,21 @@ int main(int argc, char *argv[])
 				}
 			}
 		push(&stack, atoi(value));
+		flag = 1;
 		}
-
-		for (int i = 0; opcodes[i].opcode != NULL; i++)
+		if (flag == 0)
 		{
-			if (strcmp(opcode, opcodes[i].opcode) == 0)
+			for (j = 0; opcodes[j].opcode != NULL; j++)
 			{
-				opcodes[i].f(&stack, line_number);
-				break;
+				if (strcmp(opcode, opcodes[j].opcode) == 0)
+				{
+					opcodes[j].f(&stack, line_number);
+					break;
+				}
 			}
 		}
-		
-		if (opcodes[i].opcode == NULL)
-		{
-			fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
-			fclose(file);
-			free(line);
-			free_dlistint(stack);
-			exit(EXIT_FAILURE);
-		}
+		if (j == 6)
+			invalid_instruct(line_number, opcode, file, line, stack);
 	free(line);
 	line = NULL;
 	}
@@ -214,4 +211,22 @@ int delete_dnodeint_at_index(stack_t **stack, unsigned int index)
 	node_to_delete->next->prev = node_to_delete->prev;
 	free(node_to_delete);
 	return (1);
+}
+
+/**
+ *  invalid_instruct- Handles the case of an unknown instruction
+ * @line_number: The line number in the script
+ * @opcode: The unknown instruction
+ * @file: The file pointer to the script file
+ * @line: The line buffer (to be freed)
+ * @stack: The stack (to be freed)
+ */
+
+void invalid_instruct(unsigned long line_number, const char *opcode, FILE *file, char *line, stack_t *stack)
+{
+	fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
+	fclose(file);
+	free(line);
+	free_dlistint(stack);
+	exit(EXIT_FAILURE);
 }
