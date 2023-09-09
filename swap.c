@@ -1,3 +1,5 @@
+#include "monty.h"
+
 /**
  * delete_dnodeint_at_index - func that delet a new node at a given position
  * @head: pointer to the header of the nodes
