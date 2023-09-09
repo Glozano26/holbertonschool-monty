@@ -16,16 +16,13 @@ int main(int argc, char *argv[])
 
 	if (argc != 2)
 	{
-		fprintf(stderr, "USAGE: monty file\n");
-		exit(EXIT_FAILURE);
+		error_usage();
 	}
 	file = fopen(argv[1], "r");
 	if (file == NULL)
 	{
-		fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
-		exit(EXIT_FAILURE);
+		error_file_open(argv[1]);
 	}
-
 	instruction_t opcodes[] = {
 		{"pall", pall},
 		{"pint", pint},
@@ -47,19 +44,13 @@ int main(int argc, char *argv[])
 			value = strtok(NULL, " $\n");
 			if (value == NULL)
 			{
-				fprintf(stderr, "L%lu: usage: push integer\n", line_number);
-				fclose(file);
-				free(line);
-				exit(EXIT_FAILURE);
+				print_push_error(line_number, file, line);
 			}
 			for (i = 0; value[i] != '\0'; i++)
 			{
 				if  (!isdigit(value[i]) && value[i] != '-')
 				{
-					fprintf(stderr, "L%lu: usage: push integer\n", line_number);
-					fclose(file);
-					free(line);
-					exit(EXIT_FAILURE);
+					print_push_error(line_number, file, line);
 				}
 			}
 		push(&stack, atoi(value));
@@ -77,7 +68,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		if (j == 6)
-			invalid_instruct(line_number, opcode, file, line, stack);
+			invalid_inst(line_number, opcode, file, line, stack);
 	free(line);
 	line = NULL;
 	}
@@ -92,7 +83,6 @@ int main(int argc, char *argv[])
  * @stack: Pointer to the stack
  * @value: Value to be pushed onto the stack
  */
-
 void push(stack_t **stack, int value)
 {
 	stack_t *new_node;
@@ -117,7 +107,6 @@ void push(stack_t **stack, int value)
  * @stack: pointer to free tmp
  * Return: void
  */
-
 void free_dlistint(stack_t *stack)
 {
 	stack_t *tmp;
@@ -135,7 +124,6 @@ void free_dlistint(stack_t *stack)
  * @stack: pointer to the counter nodes
  * Return: the numbers of nodes
  */
-
 size_t dlistint_len(const stack_t *stack)
 {
 	size_t i = 0;
@@ -154,7 +142,6 @@ size_t dlistint_len(const stack_t *stack)
  * @stack : pointer to list
  * Return: sum of top two elements or the stack
  */
-
 int sum_dlistint(stack_t *stack)
 
 {
@@ -169,22 +156,4 @@ int sum_dlistint(stack_t *stack)
 		i++;
 	}
 	return (sum);
-}
-
-/**
- *  invalid_instruct- Handles the case of an unknown instruction
- * @line_number: The line number in the script
- * @opcode: The unknown instruction
- * @file: The file pointer to the script file
- * @line: The line buffer (to be freed)
- * @stack: The stack (to be freed)
- */
-
-void invalid_instruct(unsigned long line_number, const char *opcode, FILE *file, char *line, stack_t *stack)
-{
-	fprintf(stderr, "L%lu: unknown instruction %s\n", line_number, opcode);
-	fclose(file);
-	free(line);
-	free_dlistint(stack);
-	exit(EXIT_FAILURE);
 }
